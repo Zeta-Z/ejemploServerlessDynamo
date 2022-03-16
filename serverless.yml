@@ -1,0 +1,125 @@
+service: myserverlessexample
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: LfspUser
+  region: us-east-1
+  enviroment:
+      tableName: ${self:custom.tableName}
+  iamRoleStatements:
+      -  Effect: Allow
+         Action: 
+             - dynamodb:*
+         Resource:
+             - arn:aws:dynamodb:us-east-1:184436236784:table/TaskTable2
+             - arn:aws:dynamodb:us-east-1:184436236784:table/player-points
+
+plugins:
+  -  serverless-s3-sync
+  -  serverless-webpack
+
+package:
+    individually: true
+
+custom:
+    tableName: player-points
+    s3Sync:
+        - bucketName: lfspserverlessbucket-123123
+          localDir: UploadData
+
+
+
+
+functions:
+  getUser:
+        handler: lambda/endpoints/getUser.handler
+        events:
+            - http:
+                  path: get-user/{ID}
+                  method: GET
+                  cors: true
+  getPlayerScore:
+        handler: lambda/endpoints/getPlayerScore.handler
+        events:
+            - http:
+                  path: get-player-score/{ID}
+                  method: GET
+                  cors: true
+  createPlayerScore:
+        handler: lambda/endpoints/createPlayerScore.handler
+        events:
+            - http:
+                  path: create-player-score/{ID}
+                  method: POST
+                  cors: true
+  createTask:
+        handler: lambda/endpoints/createtask.handler
+        events:
+            - http:
+                  path: create-Task
+                  method: POST
+                  cors: true
+  getTask:
+        handler: lambda/endpoints/gettask.getTasks
+        events:
+            - http:
+                  path: get-Task
+                  method: GET
+                  cors: true
+  getOneTask:
+        handler: lambda/endpoints/getOnetask.getOneTask
+        events:
+            - http:
+                  path: get-one-task/{ID}
+                  method: GET
+                  cors: true
+  updateTask:
+        handler: lambda/endpoints/updateTask.updateTask
+        events:
+            - http:
+                  path: update-task/{ID}
+                  method: PUT
+                  cors: true
+  deleteTask:
+        handler: lambda/endpoints/deleteTask.deleteTask
+        events:
+            - http:
+                  path: delete-task/{ID}
+                  method: DELETE
+                  cors: true
+
+
+
+resources:
+  Resources:
+    DemoBucketUpload:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: lfspserverlessbucket-123123
+    MyDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties: 
+          TableName: ${self:custom.tableName}
+          AttributeDefinitions:
+             -  AttributeName: ID
+                AttributeType: S
+          KeySchema:
+             -  AttributeName: ID
+                KeyType: HASH
+          BillingMode: PAY_PER_REQUEST
+    TaskTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+          TableName: TaskTable2
+          BillingMode: PAY_PER_REQUEST
+          AttributeDefinitions:
+             -  AttributeName: id
+                AttributeType: S
+          KeySchema:
+             -  AttributeName: id
+                KeyType: HASH
+          
+

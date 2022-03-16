@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "serverless-s3-sync": "^3.0.0",
+    "serverless-webpack": "^5.6.1",
+    "uuid": "^8.3.2",
+    "webpack": "^5.70.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.1093.0"
+  }
+}
